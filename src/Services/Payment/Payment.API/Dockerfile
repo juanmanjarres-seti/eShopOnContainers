@@ -53,6 +53,17 @@ RUN dotnet publish --no-restore -c Release -o /app
 FROM build AS publish
 
 FROM base AS final
+# vulnscan:apt-upgrade:c3f446bd
+# Transitional security pins. Strategic remediation: migrate base image.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+         curl=7.52.1-5+deb9u10 \
+         dpkg=1.18.26 \
+         libidn11=1.33-1+deb9u1 \
+         libldap-2.4-2=2.4.44+dfsg-5+deb9u9 \
+         liblz4-1=0.0~r131-2+deb9u1 \
+         login=1:4.4-4.1+deb9u1 \
+    && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 COPY --from=publish /app .
 ENTRYPOINT ["dotnet", "Payment.API.dll"]
